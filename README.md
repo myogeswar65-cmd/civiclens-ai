@@ -1,8 +1,8 @@
-** CivicLens AI  **
+# CivicLens AI  
 
 
 
-\### Computer Vision-Based Waste Monitoring System
+## Computer Vision-Based Waste Monitoring System
 
 
 
@@ -22,7 +22,7 @@ It combines object detection, video processing and a RESTful backend to provide 
 
 
 
-\## Overview
+## Overview
 
 
 
@@ -38,7 +38,7 @@ CivicLens AI explores how computer vision can assist waste-monitoring workflows 
 
 
 
-\## Key Capabilities
+## Key Capabilities
 
 
 
@@ -69,7 +69,7 @@ The following image demonstrates the waste detection and annotation output gener
 ![CivicLens AI - Annotated Waste Detection](assets/annotated-detection.png)
 
 
-\## System Architecture
+## System Architecture
 
 
 
@@ -107,7 +107,7 @@ flowchart TD
 
 
 
-\### Processing Workflow
+### Processing Workflow
 
 
 
@@ -125,7 +125,7 @@ flowchart TD
 
 
 
-\## Technology Stack
+## Technology Stack
 
 
 
@@ -151,7 +151,7 @@ flowchart TD
 
 
 
-\## Repository Structure
+## Repository Structure
 
 
 
@@ -225,7 +225,7 @@ civiclens-ai/
 
 
 
-\### Prerequisites
+### Prerequisites
 
 
 
@@ -241,7 +241,7 @@ civiclens-ai/
 
 
 
-\### 1. Clone the repository
+### 1. Clone the repository
 
 
 
@@ -423,7 +423,7 @@ For request schemas and interactive API exploration, use the FastAPI Swagger int
 
 
 
-\## Model and Inference
+## Model and Inference
 
 
 
@@ -451,7 +451,7 @@ Model performance should be evaluated on representative, independently annotated
 
 
 
-\## Engineering Considerations
+## Engineering Considerations
 
 
 
@@ -475,7 +475,7 @@ The application separates the presentation layer, API layer and inference-proces
 
 
 
-\### Configuration and security
+### Configuration and security
 
 
 
@@ -489,7 +489,7 @@ The application separates the presentation layer, API layer and inference-proces
 
 
 
-\## Limitations
+## Limitations
 
 
 
@@ -527,7 +527,7 @@ Potential engineering extensions include:
 
 
 
-\## Author
+## Author
 
 
 
@@ -541,7 +541,7 @@ AI Engineer | Computer Vision | Generative AI
 
 
 
-\## License and Third-Party Components
+## License and Third-Party Components
 
 
 
