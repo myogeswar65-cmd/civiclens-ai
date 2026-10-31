@@ -1,0 +1,1496 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WasteLens | AI Waste Monitoring</title>
+
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0a100e;
+  --panel: #111b17;
+  --panel-soft: #0d1612;
+  --line: #263a30;
+  --green: #72f0ad;
+  --muted: #96aaa0;
+  --text: #eff8f2;
+  --red: #ff8585;
+  --normal: #16a34a;
+  --overflow: #ef4444;
+  --outside: #f59e0b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(ellipse at 75% 0%, #173629 0%, transparent 40%),
+    var(--bg);
+  color: var(--text);
+  font: 14px/1.5 Inter, Segoe UI, Arial, sans-serif;
+}
+
+header {
+  height: 70px;
+  padding: 0 4%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  background: rgba(10,16,14,.85);
+}
+
+.brand {
+  font-size: 23px;
+  font-weight: 850;
+  letter-spacing: -.8px;
+}
+
+.brand span {
+  color: var(--green);
+}
+
+.status {
+  font-size: 11px;
+  color: var(--green);
+  border: 1px solid #315641;
+  border-radius: 30px;
+  padding: 6px 12px;
+}
+
+main {
+  width: 100%;
+  max-width: 1900px;
+  margin: auto;
+  padding: 28px 2.5% 45px;
+}
+
+.eyebrow {
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+h1 {
+  font-size: clamp(27px, 3vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -1.4px;
+  margin: 9px 0;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin: 9px 0 23px;
+  max-width: 720px;
+}
+
+.panel {
+  background: rgba(17,27,23,.97);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  min-width: 0;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.panel-heading h2 {
+  font-size: 14px;
+  margin: 0;
+  font-weight: 750;
+}
+
+.pill {
+  font-size: 9px;
+  border: 1px solid #355a46;
+  border-radius: 30px;
+  padding: 4px 8px;
+  color: var(--green);
+  white-space: nowrap;
+  letter-spacing: .4px;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  color: #c5d7ce;
+  margin: 13px 0 7px;
+}
+
+input, select {
+  width: 100%;
+  background: #0a130f;
+  color: var(--text);
+  border: 1px solid #34483f;
+  border-radius: 8px;
+  padding: 10px;
+  font: inherit;
+  font-size: 12px;
+}
+
+input[type=file] {
+  font-size: 11px;
+}
+
+input[type=range] {
+  padding: 0;
+  accent-color: var(--green);
+}
+
+button {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 14px;
+  font-weight: 750;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  transition: .2s ease;
+}
+
+button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--green);
+  color: #092015;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.primary:hover:not(:disabled) {
+  background: #a0f8c6;
+}
+
+.secondary {
+  background: #1b3026;
+  color: var(--text);
+  border: 1px solid #345044;
+}
+
+.secondary:hover:not(:disabled) {
+  background: #254333;
+}
+
+.hint {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.drop {
+  border: 1px dashed #456256;
+  border-radius: 10px;
+  padding: 13px;
+  background: #0b1510;
+}
+
+.filename {
+  color: var(--green);
+  font-size: 10px;
+  overflow-wrap: anywhere;
+  margin-top: 7px;
+}
+
+.notice {
+  border: 1px solid #685735;
+  background: #292315;
+  color: #f3dba1;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 10px;
+  margin-top: 12px;
+}
+
+.message {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.message.error {
+  color: var(--red);
+}
+
+.message.good {
+  color: var(--green);
+}
+
+/* CONFIGURATION */
+
+.config-panel {
+  margin-bottom: 18px;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr 1fr;
+  gap: 16px;
+  align-items: end;
+}
+
+.config-grid label {
+  margin-top: 0;
+}
+
+.config-grid .primary {
+  margin-top: 0;
+  min-height: 42px;
+}
+
+/* DASHBOARD: 20 / 60 / 20 */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 3fr)
+    minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.dashboard-panel {
+  min-width: 0;
+}
+
+/* LEFT SUMMARY */
+
+.metric-list {
+  display: grid;
+  gap: 10px;
+}
+
+.metric {
+  padding: 13px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.metric small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.metric strong {
+  display: block;
+  font-size: clamp(21px, 2vw, 28px);
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.detail-heading {
+  margin: 18px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 280px;
+  overflow: auto;
+  color: #b8d4c4;
+  font-size: 10px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* CENTER VIDEO PANEL */
+
+.video-panel {
+  padding: 18px;
+}
+
+/*
+  The stage owns the video viewing area.
+  Only one of these elements is displayed at a time:
+  emptyState OR outputVideo.
+*/
+
+.video-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 360px;
+  max-height: 75vh;
+  background: #050807;
+  border: 1px solid #263832;
+  border-radius: 11px;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* VIDEO */
+
+.video-stage video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+  background: #050807;
+}
+
+/* EMPTY STATE */
+
+.empty {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: var(--muted);
+  padding: 25px;
+  background: #050807;
+}
+
+.empty .symbol {
+  font-size: 38px;
+  color: #527663;
+  margin-bottom: 10px;
+}
+
+.empty strong {
+  color: #e6f3eb;
+  font-size: 14px;
+}
+
+.empty p {
+  color: var(--muted);
+  font-size: 11px;
+  max-width: 340px;
+  margin: 8px 0 0;
+}
+
+/* PROCESSING STATE */
+
+.processing-state {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: #050807;
+  padding: 25px;
+}
+
+.processing-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid #25372e;
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 18px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.processing-state strong {
+  color: var(--green);
+  font-size: 15px;
+}
+
+.processing-state p {
+  color: var(--muted);
+  font-size: 11px;
+  max-width: 340px;
+  margin: 8px 0 0;
+}
+
+/* VIDEO ACTIONS */
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 13px;
+}
+
+.actions button {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* RIGHT ANALYTICS */
+
+.analytics-card {
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 12px;
+  margin-bottom: 9px;
+}
+
+.analytics-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.analytics-card strong {
+  display: block;
+  font-size: 24px;
+  margin-top: 4px;
+}
+
+.analytics-card.normal {
+  border-left: 3px solid var(--normal);
+}
+
+.analytics-card.overflow {
+  border-left: 3px solid var(--overflow);
+}
+
+.analytics-card.outside {
+  border-left: 3px solid var(--outside);
+}
+
+.analytics-chart {
+  margin: 15px 0;
+  padding: 12px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+
+.analytics-chart > strong {
+  font-size: 11px;
+}
+
+.bar-row {
+  margin: 13px 0;
+}
+
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 10px;
+  margin-bottom: 6px;
+}
+
+.bar-track {
+  height: 7px;
+  background: #263832;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 20px;
+  transition: width .4s ease;
+}
+
+.bar-fill.normal {
+  background: var(--normal);
+}
+
+.bar-fill.overflow {
+  background: var(--overflow);
+}
+
+.bar-fill.outside {
+  background: var(--outside);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.classes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.class-chip {
+  background: #1c3027;
+  border: 1px solid #304c3c;
+  padding: 6px 8px;
+  border-radius: 7px;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.right-subheading {
+  margin: 17px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+footer {
+  text-align: center;
+  color: #71867b;
+  font-size: 11px;
+  padding: 20px;
+  border-top: 1px solid var(--line);
+  margin-top: 25px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1050px) {
+  .dashboard-grid {
+    grid-template-columns: minmax(0,1fr) minmax(0,2.2fr);
+  }
+
+  .right-panel {
+    grid-column: 1 / -1;
+  }
+
+  .right-analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 10px;
+  }
+
+  .analytics-card {
+    margin-bottom: 0;
+  }
+}
+
+@media(max-width:760px) {
+  header {
+    padding: 0 5%;
+  }
+
+  main {
+    padding: 22px 14px 35px;
+  }
+
+  .config-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .right-panel {
+    grid-column: auto;
+  }
+
+  .right-analytics-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+
+  .video-stage {
+    min-height: 240px;
+    max-height: 55vh;
+  }
+
+  .empty,
+  .processing-state {
+    min-height: 240px;
+  }
+}
+
+@media(max-width:480px) {
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .right-analytics-grid {
+    gap: 6px;
+  }
+
+  .analytics-card {
+    padding: 9px 7px;
+  }
+
+  .analytics-card strong {
+    font-size: 20px;
+  }
+
+  .actions button {
+    min-width: 100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">WasteLens<span>.</span></div>
+  <div class="status" id="apiStatus">Checking API</div>
+</header>
+
+<main>
+
+  <div class="eyebrow">Computer vision · Intelligent waste monitoring</div>
+
+  <h1>See waste problems.<br>Understand them instantly.</h1>
+
+  <p class="subtitle">
+    Detect normal bins, overflowing bins and garbage outside bins
+    using AI-powered video analysis.
+  </p>
+
+  <!-- CONFIGURATION -->
+
+  <section class="panel config-panel">
+
+    <div class="panel-heading">
+      <h2>01 / Configure analysis</h2>
+      <span class="pill">VIDEO INPUT</span>
+    </div>
+
+    <form id="analysisForm">
+
+      <div class="config-grid">
+
+        <div class="drop">
+          <label for="videoFile" style="margin-top:0">
+            Choose a video
+          </label>
+
+          <input
+            id="videoFile"
+            type="file"
+            accept=".mp4,.avi,.mov,.mkv,video/mp4,video/quicktime,video/x-msvideo,video/x-matroska"
+            required
+          >
+
+          <div class="hint">MP4, AVI, MOV or MKV · Maximum 500 MB</div>
+
+          <div id="fileName" class="filename">
+            No video selected
+          </div>
+        </div>
+
+        <div>
+          <label for="model">Detection model</label>
+
+          <select id="model">
+            <option value="roboflow">
+              RF-DETR Small — Roboflow Cloud
+            </option>
+            <option value="original">
+              Original — 4 waste classes
+            </option>
+            <option value="candidate">
+              Experimental — overflowing bins
+            </option>
+          </select>
+
+          <div id="modelHint" class="hint">
+            RF-DETR Small cloud model.
+          </div>
+        </div>
+
+        <div>
+          <label for="confidence">
+            Confidence: <strong id="confidenceValue">0.25</strong>
+          </label>
+
+          <input
+            id="confidence"
+            type="range"
+            min="0.10"
+            max="0.90"
+            step="0.05"
+            value="0.25"
+          >
+
+          <div class="hint">Higher values reduce weaker detections.</div>
+        </div>
+
+        <div>
+          <label for="sampling">Analyze every Nth frame</label>
+
+          <select id="sampling">
+            <option value="1">Every frame</option>
+            <option value="5">Every 5 frames</option>
+            <option value="10">Every 10 frames</option>
+            <option value="15">Every 15 frames</option>
+            <option value="30">Every 30 frames</option>
+            <option value="60" selected>Every 60 frames</option>
+            <option value="120">Every 120 frames</option>
+          </select>
+
+          <div class="hint">Controls inference frequency and API usage.</div>
+        </div>
+
+      </div>
+
+      <div id="candidateWarning" class="notice">
+        Cloud inference uses Roboflow API requests.
+        Start with every 60 frames to limit requests.
+      </div>
+
+      <button class="primary" id="runButton" type="submit">
+        Start video analysis →
+      </button>
+
+      <div id="message" class="message" role="status">
+        Checking backend availability...
+      </div>
+
+    </form>
+
+  </section>
+
+  <!-- DASHBOARD -->
+
+  <div class="dashboard-grid">
+
+    <!-- LEFT: SUMMARY -->
+
+    <section class="panel dashboard-panel" id="summaryPanel" hidden>
+
+      <div class="panel-heading">
+        <h2>02 / Summary</h2>
+        <span class="pill">OVERVIEW</span>
+      </div>
+
+      <div class="metric-list">
+
+        <div class="metric">
+          <small>Total detections</small>
+          <strong id="detCount">—</strong>
+        </div>
+
+        <div class="metric">
+          <small>Frames analyzed</small>
+          <strong id="frameCount">—</strong>
+        </div>
+
+        <div class="metric">
+          <small>Processing time</small>
+          <strong id="duration">—</strong>
+        </div>
+
+      </div>
+
+      <div class="detail-heading">Run details</div>
+
+      <pre id="details"></pre>
+
+    </section>
+
+    <!-- CENTER: ANNOTATED VIDEO -->
+
+    <section class="panel dashboard-panel video-panel">
+
+      <div class="panel-heading">
+        <h2>03 / Annotated video</h2>
+        <span class="pill" id="videoStatus">AWAITING VIDEO</span>
+      </div>
+
+      <div class="video-stage" id="videoStage">
+
+        <div id="emptyState" class="empty">
+          <div class="symbol">▣</div>
+          <strong>Your video will appear here</strong>
+          <p>
+            Choose a video and start the analysis to see the annotated output.
+          </p>
+        </div>
+
+        <video
+          id="outputVideo"
+          controls
+          playsinline
+          preload="metadata"
+          hidden
+        ></video>
+
+      </div>
+
+      <div class="actions">
+
+        <button class="secondary" id="downloadVideo" type="button" disabled>
+          Download annotated video
+        </button>
+
+        <button class="secondary" id="downloadJson" type="button" disabled>
+          Download report
+        </button>
+
+      </div>
+
+    </section>
+
+    <!-- RIGHT: ANALYTICS -->
+
+    <section class="panel dashboard-panel right-panel" id="analyticsPanel" hidden>
+
+      <div class="panel-heading">
+        <h2>04 / Analytics</h2>
+        <span class="pill">AI RESULTS</span>
+      </div>
+
+      <div class="right-analytics-grid">
+
+        <div class="analytics-card normal">
+          <small>Normal bins</small>
+          <strong id="normalCount">0</strong>
+        </div>
+
+        <div class="analytics-card overflow">
+          <small>Overflowing bins</small>
+          <strong id="overflowCount">0</strong>
+        </div>
+
+        <div class="analytics-card outside">
+          <small>Trash outside</small>
+          <strong id="outsideCount">0</strong>
+        </div>
+
+      </div>
+
+      <div class="analytics-chart">
+
+        <strong>Detection distribution</strong>
+
+        <div class="bar-row">
+          <div class="bar-label">
+            <span>Normal bins</span>
+            <span id="normalPercent">0%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill normal" id="normalBar"></div>
+          </div>
+        </div>
+
+        <div class="bar-row">
+          <div class="bar-label">
+            <span>Overflowing bins</span>
+            <span id="overflowPercent">0%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill overflow" id="overflowBar"></div>
+          </div>
+        </div>
+
+        <div class="bar-row">
+          <div class="bar-label">
+            <span>Trash outside</span>
+            <span id="outsidePercent">0%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill outside" id="outsideBar"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="legend">
+
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#16a34a"></span>
+          Normal
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#ef4444"></span>
+          Overflowing
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#f59e0b"></span>
+          Outside
+        </div>
+
+      </div>
+
+      <div class="right-subheading">Detection breakdown</div>
+
+      <div id="classCounts" class="classes"></div>
+
+    </section>
+
+  </div>
+
+</main>
+
+<footer>
+  WasteLens · AI-powered waste monitoring · Computer vision
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let currentJobId = null;
+let currentResults = null;
+let busy = false;
+
+/* MESSAGE */
+
+function showMessage(text, type = "") {
+  $("message").textContent = text;
+  $("message").className = "message " + type;
+}
+
+/* BUTTON STATE */
+
+function setBusy(value) {
+  busy = value;
+  $("runButton").disabled = value;
+
+  $("runButton").textContent = value
+    ? "Analyzing video..."
+    : "Start video analysis →";
+}
+
+/* FILE SIZE */
+
+function formatSize(bytes) {
+  return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+}
+
+/* DOWNLOAD */
+
+function downloadUrl(url, filename) {
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = filename;
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+/*
+  ENSURE EMPTY STATE EXISTS
+
+  The loading element is removed from the DOM on success.
+  This function recreates it when another analysis starts.
+*/
+
+function ensureEmptyState() {
+  let state = $("emptyState");
+
+  if (!state) {
+    state = document.createElement("div");
+    state.id = "emptyState";
+
+    const stage = $("videoStage");
+    stage.insertBefore(state, $("outputVideo"));
+  }
+
+  return state;
+}
+
+/* PROCESSING STATE */
+
+function showProcessingState() {
+  const emptyState = ensureEmptyState();
+  const video = $("outputVideo");
+
+  // Remove any previous video from the viewing area.
+  video.pause();
+  video.hidden = true;
+  video.style.display = "none";
+  video.removeAttribute("src");
+  video.load();
+
+  // Display loading state.
+  emptyState.hidden = false;
+  emptyState.className = "processing-state";
+  emptyState.style.display = "flex";
+
+  emptyState.innerHTML = `
+    <div class="processing-spinner"></div>
+    <strong>Analyzing video</strong>
+    <p>
+      Upload and AI inference are running.
+      Keep the backend running until analysis finishes.
+    </p>
+  `;
+
+  $("videoStatus").textContent = "PROCESSING";
+}
+
+/* INITIAL EMPTY STATE */
+
+function showEmptyState() {
+  const emptyState = ensureEmptyState();
+  const video = $("outputVideo");
+
+  video.pause();
+  video.hidden = true;
+  video.style.display = "none";
+  video.removeAttribute("src");
+  video.load();
+
+  emptyState.hidden = false;
+  emptyState.className = "empty";
+  emptyState.style.display = "flex";
+
+  emptyState.innerHTML = `
+    <div class="symbol">▣</div>
+    <strong>Your video will appear here</strong>
+    <p>
+      Choose a video and start the analysis to see the annotated output.
+    </p>
+  `;
+
+  $("videoStatus").textContent = "AWAITING VIDEO";
+}
+
+/*
+  READY STATE
+
+  The loading element is physically removed from the DOM.
+  The video is the only remaining child in the viewing area.
+*/
+
+function showVideoState() {
+  const emptyState = $("emptyState");
+  const video = $("outputVideo");
+
+  if (emptyState) {
+    emptyState.remove();
+  }
+
+  video.hidden = false;
+  video.style.display = "block";
+
+  $("videoStatus").textContent = "READY";
+}
+
+/* ERROR STATE */
+
+function showErrorState() {
+  const emptyState = ensureEmptyState();
+  const video = $("outputVideo");
+
+  video.pause();
+  video.hidden = true;
+  video.style.display = "none";
+
+  emptyState.hidden = false;
+  emptyState.className = "empty";
+  emptyState.style.display = "flex";
+
+  emptyState.innerHTML = `
+    <div class="symbol">!</div>
+    <strong>Analysis could not finish</strong>
+    <p>
+      Check the message above and the backend terminal.
+    </p>
+  `;
+
+  $("videoStatus").textContent = "FAILED";
+}
+
+/* API CHECK */
+
+async function checkApi() {
+  try {
+    const [health, info] = await Promise.all([
+      fetch("/health"),
+      fetch("/api/model-info")
+    ]);
+
+    if (!health.ok || !info.ok) {
+      throw new Error("API check failed");
+    }
+
+    const data = await info.json();
+
+    $("apiStatus").textContent = "● API connected";
+    $("apiStatus").style.color = "var(--green)";
+
+    for (const option of $("model").options) {
+      if (option.value === "roboflow") {
+        option.disabled = !data.cloud_gpu_connected;
+      } else {
+        const model = data.models?.[option.value];
+        option.disabled = !model || !model.available;
+      }
+    }
+
+    if ($("model").selectedOptions[0]?.disabled) {
+      $("model").value = "original";
+      updateModelDescription();
+    }
+
+    showMessage(
+      "Backend connected. Ready for video analysis.",
+      "good"
+    );
+
+  } catch (error) {
+    $("apiStatus").textContent = "● API unavailable";
+    $("apiStatus").style.color = "#ff8585";
+
+    showMessage(
+      "Cannot connect to the backend. Ensure FastAPI is running.",
+      "error"
+    );
+  }
+}
+
+/* FILE SELECTION */
+
+$("videoFile").addEventListener("change", () => {
+  const file = $("videoFile").files[0];
+
+  $("fileName").textContent = file
+    ? `${file.name} · ${formatSize(file.size)}`
+    : "No video selected";
+});
+
+/* CONFIDENCE */
+
+$("confidence").addEventListener("input", () => {
+  $("confidenceValue").textContent =
+    Number($("confidence").value).toFixed(2);
+});
+
+/* MODEL DESCRIPTION */
+
+function updateModelDescription() {
+  const selected = $("model").value;
+
+  if (selected === "roboflow") {
+    $("modelHint").textContent =
+      "RF-DETR Small cloud model: normal_bin, overflowing_bin and trash_outside_bin.";
+
+    $("candidateWarning").textContent =
+      "Cloud inference uses Roboflow API requests. Start with every 60 frames to limit requests. Processing time depends on video length and network speed.";
+
+    $("candidateWarning").hidden = false;
+    $("sampling").value = "60";
+
+  } else if (selected === "candidate") {
+    $("modelHint").textContent =
+      "Three overflowing-bin-related classes. Experimental performance; verify results visually.";
+
+    $("candidateWarning").textContent =
+      "Experimental local model: outdoor detection performance is not yet verified.";
+
+    $("candidateWarning").hidden = false;
+    $("sampling").value = "5";
+
+  } else {
+    $("modelHint").textContent =
+      "General waste categories: glass, paper, plastic and trash.";
+
+    $("candidateWarning").hidden = true;
+    $("sampling").value = "5";
+  }
+}
+
+$("model").addEventListener("change", updateModelDescription);
+
+/* MAIN ANALYSIS */
+
+$("analysisForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  if (busy) return;
+
+  const file = $("videoFile").files[0];
+
+  if (!file) {
+    return showMessage("Choose a video first.", "error");
+  }
+
+  if (file.size > 500 * 1024 * 1024) {
+    return showMessage(
+      "The file exceeds the 500 MB limit.",
+      "error"
+    );
+  }
+
+  if (file.size === 0) {
+    return showMessage(
+      "The selected file is empty.",
+      "error"
+    );
+  }
+
+  setBusy(true);
+
+  // Reset previous results.
+  $("summaryPanel").hidden = true;
+  $("analyticsPanel").hidden = true;
+
+  $("downloadVideo").disabled = true;
+  $("downloadJson").disabled = true;
+
+  currentResults = null;
+  currentJobId = null;
+
+  showProcessingState();
+  showMessage("Uploading video...");
+
+  try {
+
+    /* STEP 1: UPLOAD */
+
+    const form = new FormData();
+    form.append("file", file);
+
+    const uploadResponse = await fetch("/api/upload", {
+      method: "POST",
+      body: form
+    });
+
+    const upload = await uploadResponse.json();
+
+    if (!uploadResponse.ok) {
+      throw new Error(upload.detail || "Upload failed.");
+    }
+
+    currentJobId = upload.job_id;
+
+    showMessage(
+      `Uploaded ${upload.filename} (${upload.size_mb} MB). Starting inference...`,
+      "good"
+    );
+
+    /* STEP 2: ANALYSIS */
+
+    const params = new URLSearchParams({
+      model_choice: $("model").value,
+      confidence: $("confidence").value,
+      sample_every_n_frames: $("sampling").value
+    });
+
+    const response = await fetch(
+      `/api/jobs/${encodeURIComponent(currentJobId)}/analyze?${params}`,
+      { method: "POST" }
+    );
+
+    const payload = await response.json();
+
+    if (!response.ok) {
+      throw new Error(payload.detail || "Analysis failed.");
+    }
+
+    if (!payload.results) {
+      throw new Error("Analysis returned no results.");
+    }
+
+    currentResults = payload.results;
+
+    /* STEP 3: RENDER ANALYTICS */
+
+    renderResults(payload.results);
+
+    $("summaryPanel").hidden = false;
+    $("analyticsPanel").hidden = false;
+
+    /* STEP 4: REMOVE LOADING ELEMENT AND SHOW VIDEO */
+
+    showVideoState();
+
+    /* STEP 5: ENABLE DOWNLOADS */
+
+    $("downloadVideo").disabled = false;
+    $("downloadJson").disabled = false;
+
+    showMessage(
+      "Analysis completed. Review the detections and annotated video.",
+      "good"
+    );
+
+  } catch (error) {
+
+    showErrorState();
+
+    showMessage(
+      error.message || "Unexpected error.",
+      "error"
+    );
+
+  } finally {
+    setBusy(false);
+  }
+});
+
+/* RENDER RESULTS */
+
+function renderResults(data) {
+  $("detCount").textContent = data.detection_count ?? 0;
+  $("frameCount").textContent = data.processed_frames ?? 0;
+
+  $("duration").textContent =
+    `${data.processing_time_seconds ?? 0}s`;
+
+  const counts = data.detections_by_class || {};
+
+  // RF-DETR class analytics.
+  const normal = Number(counts.normal_bin || 0);
+  const overflow = Number(counts.overflowing_bin || 0);
+  const outside = Number(counts.trash_outside_bin || 0);
+
+  const classTotal = normal + overflow + outside;
+
+  $("normalCount").textContent = normal;
+  $("overflowCount").textContent = overflow;
+  $("outsideCount").textContent = outside;
+
+  const normalPct = classTotal
+    ? normal / classTotal * 100
+    : 0;
+
+  const overflowPct = classTotal
+    ? overflow / classTotal * 100
+    : 0;
+
+  const outsidePct = classTotal
+    ? outside / classTotal * 100
+    : 0;
+
+  $("normalPercent").textContent = normalPct.toFixed(1) + "%";
+  $("overflowPercent").textContent = overflowPct.toFixed(1) + "%";
+  $("outsidePercent").textContent = outsidePct.toFixed(1) + "%";
+
+  $("normalBar").style.width = normalPct + "%";
+  $("overflowBar").style.width = overflowPct + "%";
+  $("outsideBar").style.width = outsidePct + "%";
+
+  // Detection breakdown.
+  $("classCounts").replaceChildren();
+
+  if (!Object.keys(counts).length) {
+    const chip = document.createElement("div");
+
+    chip.className = "class-chip";
+    chip.textContent =
+      "No objects detected at this confidence threshold";
+
+    $("classCounts").appendChild(chip);
+
+  } else {
+    Object.entries(counts)
+      .sort((a, b) => Number(b[1]) - Number(a[1]))
+      .forEach(([name, count]) => {
+        const chip = document.createElement("div");
+
+        chip.className = "class-chip";
+        chip.textContent = `${name}: ${count}`;
+
+        $("classCounts").appendChild(chip);
+      });
+  }
+
+  // Set annotated video source.
+  $("outputVideo").src =
+    `/api/jobs/${encodeURIComponent(currentJobId)}/video`;
+
+  $("outputVideo").load();
+
+  // Run details.
+  $("details").textContent = JSON.stringify({
+    filename: data.filename,
+    model_choice: data.model_choice,
+    confidence_threshold: data.confidence_threshold,
+    sampling_interval: data.sampling_interval,
+    total_video_frames: data.total_video_frames,
+    video_fps: data.video_fps,
+    inference_device: data.inference_device,
+    detection_count: data.detection_count,
+    detections_by_class: counts,
+    processing_time_seconds: data.processing_time_seconds,
+    annotated_video: data.annotated_video,
+    results_file: data.results_file
+  }, null, 2);
+}
+
+/* VIDEO DOWNLOAD */
+
+$("downloadVideo").addEventListener("click", () => {
+  if (!currentResults || !currentJobId) return;
+
+  downloadUrl(
+    `/api/jobs/${encodeURIComponent(currentJobId)}/video`,
+    currentResults.annotated_video || "wastelens_annotated.mp4"
+  );
+});
+
+/* JSON DOWNLOAD */
+
+$("downloadJson").addEventListener("click", () => {
+  if (!currentResults) return;
+
+  const blob = new Blob(
+    [JSON.stringify(currentResults, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  downloadUrl(
+    url,
+    currentResults.results_file || "wastelens_results.json"
+  );
+
+  URL.revokeObjectURL(url);
+});
+
+/* INITIALIZE */
+
+updateModelDescription();
+showEmptyState();
+checkApi();
+
+</script>
+
+</body>
+</html>
